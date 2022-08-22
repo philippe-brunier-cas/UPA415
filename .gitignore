@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+doc/*.png
+doc/*.html
+__pycache__
+misc/*.css
+misc/*.png
