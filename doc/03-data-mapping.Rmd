@@ -1,0 +1,88 @@
+---
+title: "Data Mapping "
+subtitle: "CRO304"
+author: "philippe.brunier@cogne.com"
+version: 1.0 
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    css: ../misc/custom.css
+    df_print: paged
+    gallery: no
+    highlight: default
+    html_document: null
+    lightbox: yes
+    number_sections: yes
+    self_contained: yes
+    thumbnails: no
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      error = FALSE,
+                      fig.height = 7,
+                      fig.width = 10,
+                      collapse = TRUE,
+                      cols.print=20)
+rm(list = ls(all.names = TRUE))
+
+require(dplyr)
+require(kableExtra)
+require(readr)
+require(reticulate)
+source('~/dev/CRO304/R/function.R')
+```
+
+# File caricati
+
+ + deviatiCRO.txt
+ + qlik_cco.txt
+ + rcchim01_ch.txt
+
+## rcchim01_ch.txt
+
+contiene le analisi chimiche delle colate, presi da APC:RCCHIM01
+
+```{r caricamento_file_ch, include = TRUE}
+header <- read_delim('/data/CRO304/header/header_ch.csv', delim=';', col_type=cols())
+```
+
+Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
+
+```{r plot_tabella_ch, include = TRUE}
+cas_kable(header, caption='RCCHIM01')
+```
+
+## qlik_cco.txt
+
+contiene i dati cco, estratti da qlik
+
+```{r caricamento_file_cco, include = TRUE}
+header <- read_delim('/data/CRO304/header/header_qlik.csv', delim=';', col_type=cols())
+```
+
+Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
+
+```{r plot_tabella_cco, include = TRUE}
+cas_kable(header, caption='QLIK')
+```
+
+## deviatiCRO.txt
+
+questo è il file che contiene i deviati, espressi in kg, spacchettati per causale
+
+```{r caricamento_file_deviati, include = TRUE}
+header <- read_delim('/data/CRO304/header/header_deviati.csv', delim=';', col_type=cols())
+```
+
+Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
+
+```{r plot_tabella_dev, include = TRUE}
+cas_kable(header, caption='deviati')
+```
+
+

@@ -1,0 +1,150 @@
+---
+title: "Data Preparation "
+subtitle: "CRO304"
+author: "pbrunier@cogne.com"
+version: 1.0 
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    css: ../misc/custom.css
+    df_print: paged
+    gallery: no
+    highlight: default
+    html_document: null
+    lightbox: yes
+    number_sections: yes
+    self_contained: yes
+    thumbnails: no
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      error = FALSE,
+                      fig.height = 7,
+                      fig.width = 10,
+                      collapse = TRUE,
+                      cols.print=20)
+rm(list = ls(all.names = TRUE))
+
+require(dplyr)
+require(kableExtra)
+require(readr)
+require(reticulate)
+source('~/dev/CRO304/R/function.R')
+```
+
+# join dei dati
+
+```{python load_dati}
+import pandas as pd
+
+file_ch = '/data/CRO304/rcchim01_ch.txt'
+file_cco = '/data/CRO304/qlik_cco.txt'
+file_deviati = '/data/CRO304/deviatiCRO.txt'
+
+head_ch = '/data/CRO304/header/header_ch.csv'
+head_cco = '/data/CRO304/header/header_qlik.csv'
+head_deviati = '/data/CRO304/header/header_deviati.csv'
+
+head_ch = pd.read_csv(head_ch,sep=';')
+df_ch = pd.read_csv(file_ch,sep=';',
+  header = 0,
+  names = list(head_ch.col_name),
+  # dtype = list(head_ch.data_type)
+  )
+
+head_deviati = pd.read_csv(head_deviati,sep=';')
+df_deviati = pd.read_csv(file_deviati,sep=';',
+  header = 0,
+  names = list(head_deviati.col_name),
+  # dtype = list(head_ch.data_type)
+  )
+
+head_cco = pd.read_csv(head_cco,sep=';')
+df_cco = pd.read_csv(file_cco,sep=';',
+  header = 0,
+  names = list(head_cco.col_name),
+  # dtype = list(head_ch.data_type)
+  )
+
+```
+
+```{python cleaning_df}
+
+columns_ch = [ 'colata ','marca', 'data', 'C', 'S', 'P', 'Si', 'Mn', 'Cr',
+  'Ni', 'Mo','Cu', 'Sn', 'Al', 'V', 'W', 'Co', 'Ti', 'Nb',
+  'B', 'Ca', 'N2', 'FW','PA']
+
+  
+df_ch = df_ch[columns_ch]
+df_ch = df_ch.rename(columns={'colata ':'colata'})
+  
+columns_cco = ['colata', 'temperatura_liquido',
+       'temperatura_pan_media', 'temperatura_pan_std_dev',
+       'overliqs_pan_media', 'overliq_pan_std_dev', 'liv_cassetto_media',
+       'liv_cassetto_std_dev', 'liv_cassetto_2_to_4', 'liv_cassetto_over_4',
+       'pos_pistone_iniziale_media', 'pos_pistone_finale_media',
+       'pos_pistone_finale_std_dev', 'portata_primario_media',
+       'portata_primario_minimo', 'portata_primario_std_dev',
+       'press_primario_media', 'press_primario_minimo',
+       'press_primario_std_dev', 'temp_primario_ingresso',
+       'temp_primario_uscita', 'delta_temp_primario_media',
+       'delta_temp_primario_std_dev', 'press_rps_1sec', 'press_rps_2sec',
+       'press_sm1s_3sec', 'press_sm1s_4sec', 'press_aria_rp', 'press_aria_sm',
+       'veocita_col_min', 'velocita_col_media', 'velocita_col_max',
+       'velocita_col_std_dev', 'perc_dosatore_polvere_media',
+       'perc_dosatore_polvere_std_dev', 'ampiezza_tot_osc_media',
+       'ampiezza_tot_osc_std_dev', 'sbandamento_laterale_media',
+       'sbandamento_laterale_std_dev', 'sbandamento_forntale_std_dev',
+       'sbandamento_frontale_media', 'oscillazione_freq_media',
+       'oscillazione_strip_media', 'coeff_frizione_media',
+       'coeff_frizione_std_dev', 'pr01_forza_media', 'pr01_sezione_media',
+       'pr01a_forza_media', 'pr01a_sezione_media', 'pr02_forza_media',
+       'pr02_sezione_media', 'pr02a_forza_media', 'pr02a_sezione_media',
+       'pr02b_forza_media', 'pr02b_sezione_media', 'freq_mems_media',
+       'curr_mems_media', 'freq_fems_media', 'curr_fems_media',
+       'assorb_motori_media', 'deltap_rp', 'deltap_sm1', 'pr_perc','sm1_perc',
+       'sm2_perc', 'temp_t1_media', 'temp_t1_dev_std', 'temp_t2_media',
+       'temp_t2_dev_std', 'temp_t3_media', 'temp_t3_dev_std', 'temp_t4_media',
+       'temp_t4_dev_std', 'bassa_press_media_reale']
+
+df_cco = df_cco[columns_cco]
+
+columns_dev = ['colata', 'imp', 'dev', 'dev_les', 'dev_lesfrast',
+       'dev_ricarb', 'dev_rigadaido', 'dev_sfoglie', 'dev_spacclong',
+       'dev_cricca']
+
+df_deviati = df_deviati[columns_dev]
+```
+
+```{python join_dei_dati}
+
+df = df_ch.copy()
+df = df.merge(df_cco, on = 'colata', how='left')
+df = df.merge(df_deviati, on = 'colata', how='left')
+
+```
+
+```{python creazione_delle_y}
+
+
+```
+
+
+```{python save_pickle}
+
+df.to_pickle('/data/CRO304/cro304.pkl')
+
+```
+
+```{r save_rds}
+
+dati <- py$df
+write_rds(dati,'/data/CRO304/cro304.rds')
+
+
+```
