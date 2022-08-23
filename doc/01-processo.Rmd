@@ -1,6 +1,6 @@
 ---
 title: "Processo"
-subtitle: "CRO304"
+subtitle: "UPA415"
 author: "christian.scarabelli@cogne.com"
 version: 1.0 
 date: "`r Sys.Date()`"
@@ -35,18 +35,16 @@ rm(list = ls(all.names = TRUE))
 
 # Processo
 
-Nel corso degli anni 2021 e 2022, il collaudo manuale C.RO al 100% su rotoli di vergella della marca interna F304L1 ha messo in evidenza colate con deviati alti per lesioni metallurgiche. 
-Questo risulta essere problematico per l’aggravio costi causati dagli scarti extra-standard e per i possibili ritardi nelle consegne ai clienti.
-A seguito di tali eventi si vogliono analizzare i dati di processo. In questo specifico caso, si lavora su una popolazione di dati che fa riferimento alla **VERGELLA DECAPATA**.
+Nel corso degli anni 2021 e 2022, il collaudo automatico UPA su barre pelate della marca interna 415M3 ha messo in evidenza colate con deviati alti per difetto centrale. Questo risulta essere problematico per l’aggravio costi causati dagli scarti extra-standard e per i possibili ritardi nelle consegne ai clienti.
+A seguito di tali eventi si vogliono analizzare i dati di processo. In questo specifico caso, si lavora su una popolazione di dati che fa riferimento alle **BARRE PELATE**.
+I dati di processo raccolti sono relativi alle analisi chimiche finali (estratti da APC *RCCHIM01*) ed ai dati di colaggio in colata continua (estratti da Qlik *Danieli Colata Continua*). Verranno pertanto **trascurati sia i parametri di processo di fusione-fabbricazione sia quelli a valle del colaggio in CCO, perché ritenuti ininfluenti sulle variabili di risposta**.
+I dati di deviato al UPA (in questo caso UPA6) sono stati estratti da APC (*RPROC03*) e fanno riferimento (come sommatoria [#]) alle colate testate.  *Consideriamo, per semplificare, il dato omogeneo sulle varie schede della colata*.
+Per riassumere, i dati di processo (103 colate totali) sono:
 
-I dati di processo raccolti sono relativi alle analisi chimiche finali, (estratti da APC “RCCHIM01”) ed ai dati di colaggio in colata continua (estratti da Qlik “Danieli Colata Continua”). 
-*Verranno pertanto trascurati sia i parametri di processo di fusione/fabbricazione sia quelli a valle del colaggio in CCO*, perché ritenuti ininfluenti sulle variabili di risposta.
-I dati di deviato al C.RO sono stati estratti da APC (“RPROC03”) e fanno riferimento (come sommatoria) alle colate testate. 
-
-Consideriamo, per semplificare, il dato omogeneo sulle varie schede della colata.
-
-Per riassumere, i dati di processo (183 colate totali) sono:
- 
  + Analisi chimica finale per ogni colata;
  + Dati di processo di colata continua per ogni colata;
- + Dati di deviato al C.RO per lesioni metallurgiche per ogni colata.
+ + Dati di deviato (SC+DEV) al UPA per difetto centrale per ogni colata.
+ 
+[#] per sommatoria si indente che i dati sono stati pivotati per odp, tenendo conto del fatto che impiegato e scarto/deviato sono su due righe differenti.
+
+

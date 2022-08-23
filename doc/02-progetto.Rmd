@@ -35,16 +35,17 @@ rm(list = ls(all.names = TRUE))
 # Obiettivo
 
 L’obiettivo del progetto consiste:
-1.	identificare fra le variabili di processo quelle che hanno un impatto significativo sui deviati per lesioni metallurgiche al collaudo C.RO su vergella decapata di F304L1.
-2.	misurare, per le variabili di processo significative, la misura dell’impatto.
-3.	costruire un modello che permetta stimare gli scarti in funzione di tali variabili, evidenziandone i limiti.
-Causali dei deviati per lesioni metallurgiche:
 
- + Lesione;
- + Lesioni frastagliate;
- + Ricarburazione / Riga Daido;
- + Sfoglie;
- + Spaccature longitudinali / Cricca.
+1. identificare fra le variabili di processo quelle che hanno un impatto significativo sui deviati per difetto centrale al collaudo UPA su barre pelate di 415M3.
+1. misurare, per le variabili di processo significative, la misura dell’impatto.
+1. costruire un modello che permetta stimare gli scarti in funzione di tali variabili, evidenziandone i limiti.
+ 
+Soglie per deviati (SC+DEV) per difetto centrale agli ultrasuoni:
+
+ + FBH 0.7 mm (2.3% del materiale collaudato);
+ + FBH 1.0 mm (36.1% del materiale collaudato);
+ + FBH 1.5 mm (61.6% del materiale collaudato).
+
 
 
 # Fasi del progetto
