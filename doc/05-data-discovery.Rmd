@@ -39,14 +39,14 @@ require(rpart)
 require(rpart.plot)
 require(tidyr)
 require(randomForest)
-source('~/dev/CRO304/R/function.R')
+source('~/dev/UPA415/R/function.R')
 ```
 
 
 leggiamo i dati 
 
 ```{r loading_data_R}
-cro304 <- read_rds('/data/CRO304/cro304.rds')
+upa415 <- read_rds('/data/UPA415/upa415.rds')
                        
 ```
 
@@ -54,7 +54,7 @@ cro304 <- read_rds('/data/CRO304/cro304.rds')
 
 import pandas as pd
 
-df = pd.read_pickle('/data/CRO304/cro304.pkl')
+df = pd.read_pickle('/data/UPA415/upa415.pkl')
                        
 ```
 
@@ -69,14 +69,16 @@ import statsmodels.api as sm
 colori = ['blue','limegreen','darkorange','magenta','dodgerblue','dimgray','darkviolet']
 
 # genero gli scarti percentuali
-list_deviati = ['dev_les', 'dev_lesfrast',
-       'dev_ricarb', 'dev_rigadaido', 'dev_sfoglie', 'dev_spacclong',
-       'dev_cricca']
-
-df['scarto_tot_perc'] = df.dev/df.imp
 
 
-lowess = sm.nonparametric.lowess(df.scarto_tot_perc,df.index, frac=.1)
+df['y_perc'] = df.y * 100
+df['sc_fbh_07_perc'] = (df.fbh_07_scarto + df.fbh_07_dev) / df.fbh_07_imp * 100
+df['sc_fbh_10_perc'] = (df.fbh_10_scarto + df.fbh_10_dev) / df.fbh_10_imp * 100
+df['sc_fbh_15_perc'] = (df.fbh_15_scarto + df.fbh_15_dev) / df.fbh_15_imp * 100
+
+
+
+lowess = sm.nonparametric.lowess(df.y_perc,df.index, frac=.1)
 
 # unpack the lowess smoothed points to their values
 lowess_x = list(zip(*lowess))[0]
@@ -85,7 +87,7 @@ lowess_y = list(zip(*lowess))[1]
 plt.style.use('seaborn')
 
 plt.figure()
-plt.plot(df.index,df.scarto_tot_perc,'--o',linewidth=0.5,markersize=3,label='data')
+plt.plot(df.index,df.y_perc,'--o',linewidth=0.5,markersize=3,label='data')
 plt.plot(lowess_x,lowess_y,'crimson',linewidth=1,label='lowess')
 plt.xlabel('data')
 plt.ylabel('scarto percentuale')
@@ -93,16 +95,16 @@ plt.title('andamento nel tempo dello scarto totale')
 plt.legend(loc='best')
 plt.show()
 
+list_deviati = ['sc_fbh_07_perc','sc_fbh_10_perc','sc_fbh_15_perc']
+
 i = 0
 for ll in list_deviati:
-  var_name = 'scarto_%s_perc' %(ll.split('_')[-1])
   plt.figure()
-  df[var_name] = df[ll] / df['imp'] *100
 
-  plt.plot(df.index,df[var_name],'--v',color=colori[i],
-  linewidth=0.5,label=var_name,markersize=2)
+  plt.plot(df.index,df[ll],'--v',color=colori[i],
+  linewidth=0.5,label=ll,markersize=2)
   
-  lowess = sm.nonparametric.lowess(df[var_name],df.index, frac=.1)
+  lowess = sm.nonparametric.lowess(df[ll],df.index, frac=.6)
 
   # unpack the lowess smoothed points to their values
   lowess_x = list(zip(*lowess))[0]
@@ -116,68 +118,6 @@ for ll in list_deviati:
   plt.ylabel('%s' %ll)
   plt.title('andamento nel tempo per %s' %ll)
   plt.show()
-plt.style.use('default')
-
-df['scarto_tot_perc'] = df.dev/df.imp*100
-
-```
-
-
-# Analisi della difettologia
-
-Basandoci sui kg scartarti, è possibile valutare la distribuzione degli scarti. Lo scarto è valutato come $SC_{perc} = {kg_{dev}}/{kg_{imp}*100}$
-
-
-```{python analisi_scarti}
-
-list_scarti = ['scarto_tot_perc','scarto_les_perc',
-       'scarto_lesfrast_perc', 'scarto_ricarb_perc', 'scarto_rigadaido_perc',
-       'scarto_sfoglie_perc', 'scarto_spacclong_perc', 'scarto_cricca_perc']
-       
-scarti = df[list_scarti]
-
-statistica = scarti.sum()/scarti.sum().scarto_tot_perc
-statistica = statistica.drop('scarto_tot_perc',axis=0)
-print('distribuzione dei difetti in kg [perc.]')
-print(statistica)
-
-statistica = statistica[statistica.values > 0]
-titolo = 'distribuzione dei difetti sui kg di vergelle scartate'
-plt.style.use('seaborn')
-plt.figure()
-torta = statistica.plot.pie(y=statistica.values,figsize=(10,6),
-  table=False,autopct='%1.0f%%',title=titolo,fontsize=10)
-torta.set_axis_off()
-plt.show()
-plt.style.use('default')
-
-```
-
-stimando un peso di una vergella di **1200 kg**, è possibile calcolare il numero **approssimato** di vergelle scartate. Da notare che questo processo sfrutta un arrotondamento e pertanto valori come ad esempio 0.2 (pari a circa 250 kg) vengono arrotondati a zero. Di fatto, questo altera la statistica (!!!!!)
-
-```{python analisi_dif}
-
-dif = df[list_deviati]
-dif['tot'] = df['dev']
-
-peso_stimato_vergella = 1200
-
-dif = dif/peso_stimato_vergella
-dif = dif.round(0)
-
-statistica = dif.sum()/dif.sum().tot*100
-statistica = statistica.drop('tot',axis=0)
-print('distribuzione dei difetti [perc.]')
-print(statistica)
-
-statistica = statistica[statistica.values > 0]
-titolo = 'distribuzione dei difetti sul numero stimato di vergelle scartate'
-plt.style.use('seaborn')
-plt.figure()
-torta = statistica.plot.pie(y=statistica.values,figsize=(10,6),
-  table=False,autopct='%1.0f%%',title=titolo,fontsize=10)
-torta.set_axis_off()
-plt.show()
 plt.style.use('default')
 
 ```
@@ -210,7 +150,7 @@ for (i in seq_len(n)) {
 }                     
 ```
 
-# Analisi delle correlazioni variabili input VS variabile risposta (Rm)
+# Analisi delle correlazioni variabili input VS variabile risposta (scarto percentuale)
 
 analisi di correlazioni
 
@@ -226,8 +166,8 @@ for (i in seq_len(n)) {
   var_i <- vars[i]
   title_i <- titles[i]
   pl <- ggplot(dati)+
-    geom_line(aes(!!sym(var_i),scarto_tot_perc))+
-                geom_smooth(aes(!!sym(var_i),scarto_tot_perc),
+    geom_line(aes(!!sym(var_i),y_perc))+
+                geom_smooth(aes(!!sym(var_i),y_perc),
                             method ='loess',
                             se=FALSE, col='red')
               
@@ -241,11 +181,12 @@ for (i in seq_len(n)) {
 
 ```{r decision_tree}
 dati_tree <- dati %>% 
-  select(scarto_tot_perc,C:bassa_press_media_reale)
+  select(y_perc,C:bassa_press_media_reale)
 
-fm <- rpart(formula=scarto_tot_perc ~ .,
+fm <- rpart(formula= y_perc ~ .,
             data = dati_tree,
             method = 'anova',
+            weights = dati$imp, 
             cp = 0.02)
 
 rpart.plot(fm,
@@ -259,192 +200,10 @@ rpart.plot(fm,
 ```{r randomforest}
 
 dati_tree <- na.omit(dati_tree)
-rf <- randomForest(formula = scarto_tot_perc ~ .,
+rf <- randomForest(formula = y_perc ~ .,
                  data = dati_tree,
-                 ntree = 500)
-
-# Variable importance plot
-varImpPlot(rf, main='Variable importance Plot')
-# Plotting model
-plot(rf,main='convergence plot')
-# Importance plot
-importance(rf)
-```
-
-A seguito di una ragionata, abbiamo valutato che conviene riassumere la difettologia in due categorie principali: 
-
- + tipo A : lesioni + lesioni frastagliate + sfoglie
- + tipo B : ricarburazione + riga DAIDO
- 
-```{python clustering_difetti}
- 
-tipo_dif = []
- 
-r,c = df.shape
- 
-for i in range(0,r):
-  
-  if df.dev[i] > 0:
-  #ho dello scarto, vado a vedere di che tipo
-    for dd in list_deviati:
-      print(i,dd)
-      if df[dd][i] > 0:
-        if dd == 'dev_les':
-          tipo_dif.append('lesioni')
-          break
-        elif dd == 'dev_lesfrast':
-          tipo_dif.append('lesioni')
-          break
-        elif dd == 'dev_sfoglie':
-          tipo_dif.append('lesioni')
-          break
-        elif dd == 'dev_ricarb':
-          tipo_dif.append('ricarb')
-          break
-        elif dd == 'dev_rigadaido':
-          tipo_dif.append('ricarb')
-          break
-        else:
-          tipo_dif.append('x')
-          break
-  else:
-    tipo_dif.append('no')
-
-df['tipo_dif'] = tipo_dif
-
-dfL = df[df.tipo_dif == 'lesioni']
-dfR = df[df.tipo_dif == 'ricarb']
-df0 = df[df.tipo_dif == 'no']
-
-```
-
-```{r moving_vars}
-
-datiL <- py$dfL
-datiR <- py$dfR
-dati0 <- py$df0
-
-```
-
-così facendo, ho la seguente statistica: 
-
- + `r nrow(datiL)` casi per lesioni
- + `r nrow(datiR)` casi per ricarburazioni
- + `r nrow(dati0)` ok
-
-# database SOLO LESIONI
-
-## input VS output
-
-```{r correlazioni_L,results='asis'}
-vars <- datiL %>%
-  select(C:bassa_press_media_reale) %>%
-  names()
-titles <- paste('### Andamento nel tempo della variabile ', vars)
-
-n <- length(vars)
-
-for (i in seq_len(n)) {
-  var_i <- vars[i]
-  title_i <- titles[i]
-  pl <- ggplot(datiL)+
-    geom_line(aes(!!sym(var_i),scarto_tot_perc))+
-                geom_smooth(aes(!!sym(var_i),scarto_tot_perc),
-                            method ='loess',
-                            se=FALSE, col='red')
-              
-              cat(title_i, '\n')
-              print(pl)
-              cat('<p>')
-}    
-```
-
-## decision tree
-
-```{r decision_tree_L}
-dati_tree <- datiL %>% 
-  select(scarto_tot_perc,C:bassa_press_media_reale)
-
-fm <- rpart(formula=scarto_tot_perc ~ .,
-            data = dati_tree,
-            method = 'anova',
-            cp = 0.02)
-
-rpart.plot(fm,
-           extra=101)
-
-
-```
-
-## random forest
-
-```{r randomforest_L}
-
-dati_tree <- na.omit(dati_tree)
-rf <- randomForest(formula = scarto_tot_perc ~ .,
-                 data = dati_tree,
-                 ntree = 500)
-
-# Variable importance plot
-varImpPlot(rf, main='Variable importance Plot')
-# Plotting model
-plot(rf,main='convergence plot')
-# Importance plot
-importance(rf)
-```
-
-# database SOLO RICARB
-
-## input VS output
-
-```{r correlazioni_R,results='asis'}
-vars <- datiR %>%
-  select(C:bassa_press_media_reale) %>%
-  names()
-titles <- paste('### Andamento nel tempo della variabile ', vars)
-
-n <- length(vars)
-
-for (i in seq_len(n)) {
-  var_i <- vars[i]
-  title_i <- titles[i]
-  pl <- ggplot(datiR)+
-    geom_line(aes(!!sym(var_i),scarto_tot_perc))+
-                geom_smooth(aes(!!sym(var_i),scarto_tot_perc),
-                            method ='loess',
-                            se=FALSE, col='red')
-              
-              cat(title_i, '\n')
-              print(pl)
-              cat('<p>')
-}    
-```
-
-## decision tree
-
-```{r decision_tree_R}
-dati_tree <- datiR %>% 
-  select(scarto_tot_perc,C:bassa_press_media_reale)
-
-fm <- rpart(formula=scarto_tot_perc ~ .,
-            data = dati_tree,
-            method = 'anova',
-            cp = 0.02)
-
-rpart.plot(fm,
-           extra=101)
-
-
-```
-
-## random forest
-
-```{r randomforest_R}
-
-dati_tree <- na.omit(dati_tree)
-rf <- randomForest(formula = scarto_tot_perc ~ .,
-                 data = dati_tree,
-                 ntree = 500)
+                 weights = dati$imp,
+                 ntree = 1000)
 
 # Variable importance plot
 varImpPlot(rf, main='Variable importance Plot')

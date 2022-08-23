@@ -1,6 +1,6 @@
 ---
 title: "Data Preparation "
-subtitle: "CRO304"
+subtitle: "UPA415"
 author: "pbrunier@cogne.com"
 version: 1.0 
 date: "`r Sys.Date()`"
@@ -34,37 +34,39 @@ require(dplyr)
 require(kableExtra)
 require(readr)
 require(reticulate)
-source('~/dev/CRO304/R/function.R')
+source('~/dev/UPA415/R/function.R')
 ```
 
 # join dei dati
 
+viene caricato **SOLO** deviati_dettaglio.txt, in quanto deviati.txt sembra essere ridondante
+
 ```{python load_dati}
 import pandas as pd
 
-file_ch = '/data/CRO304/rcchim01_ch.txt'
-file_cco = '/data/CRO304/qlik_cco.txt'
-file_deviati = '/data/CRO304/deviatiCRO.txt'
+file_ch = '/data/UPA415/rcchim01.txt'
+file_cco = '/data/UPA415/qlik_cco.txt'
+file_deviati = '/data/UPA415/deviati_dettaglio.txt'
 
-head_ch = '/data/CRO304/header/header_ch.csv'
-head_cco = '/data/CRO304/header/header_qlik.csv'
-head_deviati = '/data/CRO304/header/header_deviati.csv'
+path_head_ch = '/data/UPA415/header/header_ch.csv'
+path_head_cco = '/data/UPA415/header/header_qlik.csv'
+path_head_deviati = '/data/UPA415/header/header_deviati_dettaglio.csv'
 
-head_ch = pd.read_csv(head_ch,sep=';')
+head_ch = pd.read_csv(path_head_ch,sep=';')
 df_ch = pd.read_csv(file_ch,sep=';',
   header = 0,
   names = list(head_ch.col_name),
   # dtype = list(head_ch.data_type)
   )
 
-head_deviati = pd.read_csv(head_deviati,sep=';')
+head_deviati = pd.read_csv(path_head_deviati,sep=';')
 df_deviati = pd.read_csv(file_deviati,sep=';',
   header = 0,
   names = list(head_deviati.col_name),
   # dtype = list(head_ch.data_type)
   )
 
-head_cco = pd.read_csv(head_cco,sep=';')
+head_cco = pd.read_csv(path_head_cco,sep=';')
 df_cco = pd.read_csv(file_cco,sep=';',
   header = 0,
   names = list(head_cco.col_name),
@@ -114,9 +116,12 @@ columns_cco = ['colata', 'temperatura_liquido',
 
 df_cco = df_cco[columns_cco]
 
-columns_dev = ['colata', 'imp', 'dev', 'dev_les', 'dev_lesfrast',
-       'dev_ricarb', 'dev_rigadaido', 'dev_sfoglie', 'dev_spacclong',
-       'dev_cricca']
+columns_dev = ['colata', 
+  'fbh_07_imp','fbh_07_scarto','fbh_07_dev',
+  'fbh_10_imp','fbh_10_scarto', 'fbh_10_dev',
+  'fbh_15_imp', 'fbh_15_scarto','fbh_15_dev', 
+  'imp', 'sc', 'dev', 
+  'y']
 
 df_deviati = df_deviati[columns_dev]
 ```
@@ -137,14 +142,14 @@ df = df.merge(df_deviati, on = 'colata', how='left')
 
 ```{python save_pickle}
 
-df.to_pickle('/data/CRO304/cro304.pkl')
+df.to_pickle('/data/UPA415/upa415.pkl')
 
 ```
 
 ```{r save_rds}
 
 dati <- py$df
-write_rds(dati,'/data/CRO304/cro304.rds')
+write_rds(dati,'/data/UPA415/upa415.rds')
 
 
 ```
