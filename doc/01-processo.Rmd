@@ -45,6 +45,8 @@ Per riassumere, i dati di processo (103 colate totali) sono:
  + Dati di processo di colata continua per ogni colata;
  + Dati di deviato (SC+DEV) al UPA per difetto centrale per ogni colata.
  
+I dati fanno riferimento agli anni 2021 e 2022.
+ 
 [#] per sommatoria si indente che i dati sono stati pivotati per odp, tenendo conto del fatto che impiegato e scarto/deviato sono su due righe differenti.
 
 
