@@ -1,6 +1,6 @@
 ---
 title: "Data Mapping "
-subtitle: "CRO304"
+subtitle: "UPA415"
 author: "philippe.brunier@cogne.com"
 version: 1.0 
 date: "`r Sys.Date()`"
@@ -34,21 +34,22 @@ require(dplyr)
 require(kableExtra)
 require(readr)
 require(reticulate)
-source('~/dev/CRO304/R/function.R')
+source('~/dev/UPA415/R/function.R')
 ```
 
 # File caricati
 
- + deviatiCRO.txt
  + qlik_cco.txt
- + rcchim01_ch.txt
+ + rcchim01.txt
+ + deviati.txt
+ + deviati_dettaglio.txt
 
-## rcchim01_ch.txt
+## rcchim01.txt
 
 contiene le analisi chimiche delle colate, presi da APC:RCCHIM01
 
 ```{r caricamento_file_ch, include = TRUE}
-header <- read_delim('/data/CRO304/header/header_ch.csv', delim=';', col_type=cols())
+header <- read_delim('/data/UPA415/header/header_ch.csv', delim=';', col_type=cols())
 ```
 
 Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
@@ -62,7 +63,7 @@ cas_kable(header, caption='RCCHIM01')
 contiene i dati cco, estratti da qlik
 
 ```{r caricamento_file_cco, include = TRUE}
-header <- read_delim('/data/CRO304/header/header_qlik.csv', delim=';', col_type=cols())
+header <- read_delim('/data/UPA415/header/header_qlik.csv', delim=';', col_type=cols())
 ```
 
 Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
@@ -71,12 +72,12 @@ Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
 cas_kable(header, caption='QLIK')
 ```
 
-## deviatiCRO.txt
+## deviati.txt
 
 questo è il file che contiene i deviati, espressi in kg, spacchettati per causale
 
 ```{r caricamento_file_deviati, include = TRUE}
-header <- read_delim('/data/CRO304/header/header_deviati.csv', delim=';', col_type=cols())
+header <- read_delim('/data/UPA415/header/header_deviati.csv', delim=';', col_type=cols())
 ```
 
 Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
@@ -85,4 +86,16 @@ Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
 cas_kable(header, caption='deviati')
 ```
 
+## deviati_dettaglio.txt
 
+questo è il file che contiene i deviati, espressi in kg, spacchettati per causale
+
+```{r caricamento_file_deviati_dettaglio, include = TRUE}
+header <- read_delim('/data/UPA415/header/header_deviati_dettaglio.csv', delim=';', col_type=cols())
+```
+
+Il file è composto da `r nrow(header)` colonne, con le seguenti specifiche
+
+```{r plot_tabella_dev_dettaglio, include = TRUE}
+cas_kable(header, caption='deviati_dettaglio')
+```
